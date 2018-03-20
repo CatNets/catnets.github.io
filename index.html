@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+  <title>CatNet</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <script src="jquery.min.js"></script>
+  <script src="bootstrap.min.js"></script>
+  <script src="index.min.js"></script>
+  <script type="text/javascript">
+    const node = new Ipfs({ repo: 'ipfs-' + Math.random() })
+
+    node.once('ready', () => {
+      console.log('Online status: ', node.isOnline() ? 'online' : 'offline')
+
+
+      document.getElementById("status").innerHTML= (node.isOnline() ? '💡' : '📴')
+      // You can write more code here to use it. Use methods like 
+      // node.files.add, node.files.get. See the API docs here:
+      // https://github.com/ipfs/interface-ipfs-core
+    })
+
+  </script>
+  <style>
+i {
+   font-size: 10px;
+}
+img {
+   width: 95%;
+   border-radius: 50%;
+}
+h1 {
+   font-size: 55px;
+}
+.content {
+	margin-bottom: 150px;
+}
+.footer {
+   position:fixed;
+   left:0px;
+   width:100%;
+   background: white;
+}
+.col-xs-3 {
+   float: right;
+   max-width: 113px; 
+   padding-top: 8px;
+   padding-bottom: 8px;
+}
+.col-xs-4 {
+   width:33%; margin-top: 25px;
+}
+@media screen and (min-width: 601px) {
+    .footer {
+        top:0px;
+    }
+    .content {
+	    margin-top: 150px;
+    }
+}
+@media screen and (max-width: 600px) {
+    .footer {
+        bottom:0px;
+    }
+    .title {
+        display: none;
+    }
+}
+
+input{
+visibility:hidden;
+}
+  </style>
+</head>
+</head>
+<body>
+<input type="file" id="files" name="files[]" multiple />
+<output id="list"></output>
+
+<script>
+  function addFile(file){
+	node.files.add(new node.types.Buffer(file), (err, filesAdded) => {
+		if (err) {
+			return console.error('Error - ipfs files add', err, res)
+		}
+
+		filesAdded.forEach((file) => console.log('successfully stored', file.hash))
+    })
+  }
+
+
+  function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f; f = files[i]; i++) {
+
+      // Only process image files.
+      if (!f.type.match('image.*')) {
+        continue;
+      }
+
+      var reader = new FileReader();
+
+      // Closure to capture the file information.
+      reader.onload = (function(theFile) {
+        return function(e) {
+          addFile(e.target.result);
+          // Render thumbnail.
+          var span = document.createElement('span');
+          span.innerHTML = ['<img class="col-xs-4" src="', e.target.result,
+                            '" title="', escape(theFile.name), '"/>'].join('');
+          document.getElementById('list').insertBefore(span, null);
+        };
+      })(f);
+			
+      // Read in the image file as a data URL.
+      reader.readAsDataURL(f);
+    }
+  }
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
+  <!--h1>IPFS in the Browser</h1>
+  <p>This page creates an IPFS node in your browser and drops it into the global Javascript namespace as <b><em style="background-color:#d7d6d6">node</em></b>. Open the console to play around with it.</p>
+  <p>Note that opening two tabs of this page in the same browser won't work well, because they will share node configuration. You'll end up trying to run two instances of the same node, with the same private key and identity, which is a Bad Idea.</p>
+
+  <h2>Some suggestions</h2>
+
+  <p>Try adding a new file:</p>
+
+  <code style="display:block; white-space:pre-wrap; background-color:#d7d6d6">
+    node.files.add(Buffer.from(f), (err, filesAdded) => {
+      if (err) {
+        return console.error('Error - ipfs files add', err, res)
+      }
+
+      filesAdded.forEach((file) => console.log('successfully stored', file.hash))
+    })
+  </code>
+
+  <p>You can cat that same file. If you used the exact same string as above ('Hello world!') you should have an hash like this: 'QmQzCQn4puG4qu8PVysxZmscmQ5vT1ZXpqo7f58Uh9QfyY'</p>
+
+  <code style="display:block; white-space:pre-wrap; background-color:#d7d6d6">
+    node.files.cat('QmQzCQn4puG4qu8PVysxZmscmQ5vT1ZXpqo7f58Uh9QfyY', function (err, data) {
+      if (err) {
+        return console.error('Error - ipfs files cat', err, res)
+      }
+
+      console.log(data.toString())
+    })
+  </code-->
+  
+<div class="footer container-fluid">
+
+  <div class="row">
+    <div class="col-xs-3"><a href="#" onclick="document.getElementById('files').click(); return false;" /><img src="photo.png"/></a></div>
+    <div class="col-xs-3"><img src="video.png"/></div>
+    <div class="col-xs-3"><img src="music.jpg"/></div>
+    <div class="col-xs-3"><img src="game.jpg"/></div>
+    <div class="title"><h1>&ensp;🐱☸️</h1></div>
+  </div>
+
+</div>
+<br><h1><b id="status">📴 </b></h1><br>
+</body>
+</html>
